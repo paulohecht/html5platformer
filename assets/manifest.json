@@ -1,0 +1,13 @@
+[
+    {"src": "assets/sprites/avatar-player.png", "id": "player-avatar"},
+    {"src": "assets/sprites/avatar-princess.png", "id": "princess-avatar"},
+    {"src": "assets/sprites/player.png", "id": "player-sprite"},
+    {"src": "assets/sprites/fish.png", "id": "fish-sprite"},
+    {"src": "assets/sprites/popup.png", "id": "popup"},
+    {"src": "assets/tiled/tileset.png", "id": "tileset"},
+
+    {"src": "assets/audio/bg.ogg", "id": "bg-music"},
+    {"src": "assets/audio/jump.ogg", "id": "jump-sound"},
+    {"src": "assets/audio/dead.ogg", "id": "dead-sound"},
+    {"src": "assets/audio/princess.ogg", "id": "princess-sound"}
+]   

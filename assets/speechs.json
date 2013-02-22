@@ -1,0 +1,50 @@
+{
+    "characters": {
+        "player": {
+            "avatar": "player-avatar",
+            "name": "Hecht"
+        },
+        "princess": {
+            "avatar": "princess-avatar",
+            "name": "Naty"
+        }
+    },
+    "speechs": {
+        "intro": [
+            {
+                "character": "player",
+                "text": "Hey there! I'm Paulo Hecht and I'm here to save princess Naty..\nShe's waiting for me at the end of the level..."
+            },
+            {
+                "character": "princess",
+                "text": "HEEEELP! HEEEELP!..."
+            },
+            {
+                "character": "player",
+                "text": "As you may have noticed, this is an HTML5 open source project I've been working on. In the near future, I intend to start a blog to write down more details about it..."
+            },
+            {
+                "character": "player",
+                "text": "For instance, take a look at the GitHub page, there may be something there already... at least credits to all the guys that made it possible without even knowing it... gosh I hope I remember them all!"
+            },
+            {
+                "character": "player",
+                "text": "It's a basic platformer, I may write down things I still want to develop in GitHub, like Camera movement, Parallax, and, why not, some goombas, and..."
+            },
+            {
+                "character": "princess",
+                "text": "HECHT! STOP NERDING ABOUT THIS STUPID PROJECT AND COME SAVE ME!"
+            },
+            {
+                "character": "player",
+                "text": "Errrr... Got to go now... hope you got the point... just use arrow keys and that's all...\nI'M GOING AFTER YOU PRINCESS!!!"
+            }
+        ],
+        "saved": [
+            {
+                "character": "princess",
+                "text": "SMACK! You are my hero!!!"
+            }         
+        ]
+    }
+}
