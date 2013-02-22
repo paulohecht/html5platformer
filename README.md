@@ -3,6 +3,8 @@ HTML5 Platformer
 
 Check the demo at http://paulohecht.com/html5platformer
 
+<a href="http://paulohecht.com/html5platformer"><img src="http://paulohecht.com/images/html5platformer.jpg" /></a>
+
 Still a demo, but that's something already...
 
 Next steps are: Moving camera, Parallax, Goombas, Levels...
