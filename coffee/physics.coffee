@@ -79,10 +79,32 @@ class CustomContactListener extends Box2D.Dynamics.b2ContactListener
         fixtureB = contact.GetFixtureB()
         userDataA = fixtureA.GetBody().GetUserData()
         userDataB = fixtureB.GetBody().GetUserData()
-        if @checkReciprocrate(userDataA, userDataB, "player", "princess")
-          Game.Instances.getPlayer().touchPrincess()
-        if @checkReciprocrate(userDataA, userDataB, "player", "enemy")
-          Game.Instances.getPlayer().die()
+        
+        #Ground sensor...
+        sensorName = "foot"
+        if ((fixtureA.GetUserData() == sensorName && @isGround(userDataB)) || (fixtureB.GetUserData() == sensorName && @isGround(userDataA)))
+          Game.Instances.getPlayer().addFootContact()
+        sensorName = "body"
+        if ((fixtureA.GetUserData() == sensorName && @isGround(userDataB)) || (fixtureB.GetUserData() == sensorName && @isGround(userDataA)))
+          Game.Instances.getPlayer().addBodyContact()
+          
+        if (userDataA == "player" || userDataB == "player") 
+          Game.Instances.getPlayer().onCollision((if userDataA == "player" then userDataB else userDataA))
+        
+    EndContact: (contact) =>
+        fixtureA = contact.GetFixtureA()
+        fixtureB = contact.GetFixtureB()
+        userDataA = fixtureA.GetBody().GetUserData()
+        userDataB = fixtureB.GetBody().GetUserData()
+
+        #Ground sensor...          
+        sensorName = "foot"
+        if ((fixtureA.GetUserData() == sensorName && @isGround(userDataB)) || (fixtureB.GetUserData() == sensorName && @isGround(userDataA)))
+          Game.Instances.getPlayer().removeFootContact()
+        sensorName = "body"
+        if ((fixtureA.GetUserData() == sensorName && @isGround(userDataB)) || (fixtureB.GetUserData() == sensorName && @isGround(userDataA)))
+          Game.Instances.getPlayer().removeBodyContact()
+          
     
     PreSolve: (contact, oldManifold) =>
         fixtureA = contact.GetFixtureA()
@@ -97,14 +119,16 @@ class CustomContactListener extends Box2D.Dynamics.b2ContactListener
         if @checkReciprocrate(userDataA, userDataB, "player", "cloud")
           playerBody = fixtureA.GetBody()
           cloudBody = fixtureB.GetBody()
-          [playerBody, cloudBody] = [cloudBody, playerBody] unless userDataA == "player"
+          [playerBody, cloudBody] = [cloudBody, playerBody] if userDataA == "cloud"
           playerPosition = playerBody.GetPosition().y
           playerRadius = playerBody.GetFixtureList().GetShape().GetRadius()
           cloudPosition = cloudBody.GetPosition().y
           cloudVertices = cloudBody.GetFixtureList().GetShape().GetVertices()
           cloudHeight = cloudVertices[2].y - cloudVertices[0].y 
-          if playerPosition - cloudPosition > -(playerRadius + (cloudHeight / 2) - 0.1)
+          if playerPosition - cloudPosition > -(playerRadius + (cloudHeight / 2) - 0.1) || playerBody.GetLinearVelocity().y < 0
             contact.SetEnabled(false)
-            
       checkReciprocrate: (var1, var2, value1, value2) =>
         (var1 == value1 && var2 == value2) || (var1 == value2 && var2 == value1)
+        
+      isGround: (value) =>
+        value in ["box", "cloud"]

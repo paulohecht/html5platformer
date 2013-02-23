@@ -42,13 +42,15 @@ class Game.AudioImpl
   
   bgInstance: null
   
+  bgVolume: 0.4
+  
   playSFX: (id) =>
       return if @isMuteSFX
       #Play the sound: play (src, interrupt, delay, offset, loop, volume, pan)
       createjs.SoundJS.play(id, createjs.SoundJS.INTERRUPT_ANY)
 
   playBG: (id) =>
-    @bgInstance = createjs.SoundJS.play(id, createjs.SoundJS.INTERRUPT_ANY, 0, 0, -1, 0.4) 
+    @bgInstance = createjs.SoundJS.play(id, createjs.SoundJS.INTERRUPT_ANY, 0, 0, -1, @bgVolume) 
 
   muteSFX: =>
     @isMuteSFX = true
@@ -76,7 +78,7 @@ class Game.AudioImpl
     if @isMuteBG
       @bgInstance.setVolume(0)
     else
-      @bgInstance.setVolume(1)
+      @bgInstance.setVolume(@bgVolume)
       
   pause: =>
     @bgInstance.setVolume(0)

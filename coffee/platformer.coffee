@@ -64,11 +64,13 @@ class Game.Platformer
 
   tick: (elapsed) =>
     
+    Game.Audio.toggleMuteBG() if (Game.Input.isKeyDown("m"))
+    
     Game.Physics.update(elapsed)
     Game.Input.update()
     Game.Popup.update()
     
-    @player.update(elapsed)
+    @player.update(elapsed) if @player
     
     @stage.update()
 

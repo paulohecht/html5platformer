@@ -6,10 +6,8 @@ class Game.Player extends Game.Mixable
   
   jump: 4.5
   isJumping: false
-  maxJumpImpulseTime: 100
+  maxJumpImpulseTime: 120
   jumpImpulseTime: 0
-  maxJumpHeight: 5
-  jumpInitialY: 0
   
   width: 16
   height: 32
@@ -17,6 +15,9 @@ class Game.Player extends Game.Mixable
   direction: 'right'
   
   physicsSize: 10
+  
+  footContactCount: 0
+  bodyContactCount: 0
   
   render: (@stage, @x, @y) =>
     
@@ -41,9 +42,9 @@ class Game.Player extends Game.Mixable
 
     @stage.addChild(@bitmap)
     
-    #createjs.Ticker.addListener(@)
-    
     @createPhysicsBody()
+    @createBodySensor()
+    @createFootSensor()
     
     @respawn(@x, @y)
     
@@ -63,6 +64,22 @@ class Game.Player extends Game.Mixable
     @body = Game.Physics.createBody(bodyDef)
     @body.CreateFixture(fixDef)
     
+  createBodySensor: =>
+    fixDef = new Box2D.Dynamics.b2FixtureDef()
+    fixDef.shape = new Box2D.Collision.Shapes.b2CircleShape(@physicsSize / (Game.Physics.SCALE * 1.5))
+    fixDef.isSensor = true
+    fixDef.userData = "body"
+    @bodySensor = @body.CreateFixture(fixDef)
+    
+  createFootSensor: =>
+    fixDef = new Box2D.Dynamics.b2FixtureDef()
+    fixDef.shape = new Box2D.Collision.Shapes.b2CircleShape(@physicsSize / (Game.Physics.SCALE * 4) )
+    fixDef.isSensor = true
+    fixDef.userData = "foot"
+    fixDef.shape.m_p.y = @physicsSize / Game.Physics.SCALE
+    @footSensor = @body.CreateFixture(fixDef)
+    
+    
   respawn: (@x, @y) =>
     @bitmap.gotoAndPlay("stand_#{@direction}")
     @bitmap.x = @x
@@ -81,7 +98,7 @@ class Game.Player extends Game.Mixable
     @bitmap.y = @y = (@body.GetPosition().y * Game.Physics.SCALE) - 22
     
     @die() if @y > 350
-
+    
   processInput: (elapsed) =>
 
     return if @dead
@@ -91,24 +108,23 @@ class Game.Player extends Game.Mixable
     vel.x += @velocity if Game.Input.isKeyPressed("right")
     vel.x -= @velocity if Game.Input.isKeyPressed("left")
 
-    if (Game.Input.isKeyPressed("up") && (vel.y == 0 || @isJumping))
-      @body.ApplyImpulse({ x: 0, y: -@jump }, @body.GetWorldCenter())
-      unless @isJumping
-        @jumpInitialY = @body.GetPosition().y
+    if (Game.Input.isKeyPressed("up"))
+
+      if (@isTouchingGround() && !@isJumping && !(vel.y < 0)) 
         Game.Audio.playSFX("jump-sound") 
+        @isJumping = true
+        @jumpImpulseTime = 0
+
+      if (@isJumping)
+        @body.ApplyImpulse({ x: 0, y: -@jump }, @body.GetWorldCenter())
+        @jumpImpulseTime += elapsed
+
       if (@jumpImpulseTime > @maxJumpImpulseTime)
         @isJumping = false
-      else
-        @jumpImpulseTime += elapsed
-        @isJumping = true
+
     else
       @isJumping = false
-      @jumpImpulseTime = 0
 
-    if @isJumping && (@jumpInitialY - @body.GetPosition().y > @maxJumpHeight)
-      @isJumping = false
-      vel.y = 1
-    
     @direction = 'right' if vel.x > 0
     @direction = 'left' if vel.x < 0
     
@@ -140,3 +156,25 @@ class Game.Player extends Game.Mixable
       
   playAnimation: (animation) =>
     @bitmap.gotoAndPlay(animation) unless animation == @bitmap.currentAnimation
+    
+  addBodyContact: =>
+    @bodyContactCount++    
+
+  removeBodyContact: =>
+    @bodyContactCount--
+    
+  addFootContact: =>
+    @footContactCount++    
+
+  removeFootContact: =>
+    @footContactCount--
+    
+  isTouchingGround: =>
+    @footContactCount > 0 && @bodyContactCount == 0
+    
+  onCollision: (other) =>
+    switch(other)
+      when "princess" then @touchPrincess()
+      when "enemy" then @die()
+    
+    
