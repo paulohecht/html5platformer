@@ -16,6 +16,12 @@
   
   @getPlayer: =>
     @instance().getPlayer()
+
+  @createCamera: (stage) =>
+    @instance().createCamera(stage)
+  
+  @getCamera: =>
+    @instance().getCamera()
   
 class Game.InstancesImpl
   
@@ -32,3 +38,10 @@ class Game.InstancesImpl
     
   getStage: =>
     @stage 
+
+  createCamera: (stage) =>
+    @camera = new Game.Camera(stage)
+    @camera
+    
+  getCamera: =>
+    @camera

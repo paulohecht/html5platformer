@@ -98,14 +98,17 @@
    </properties>
   </tile>
  </tileset>
- <layer name="Sky" width="50" height="13">
+ <layer name="Sky" width="50" height="13" visible="0">
+  <properties>
+   <property name="parallax" value="true"/>
+  </properties>
   <data encoding="base64" compression="zlib">
    eJzt0sENwCAMA8DsPwItfErbNTETIFtB4uHH/QIhwS0iWpIHXvjgT7yXUeCCG+pBfdj6uctO7LOI87J92HrlPVn3npoF9oySBWVu5W935mF31szMbG0A9o6SGQ==
   </data>
  </layer>
  <layer name="Platforms" width="50" height="13">
   <data encoding="base64" compression="zlib">
-   eJztz70OAUEUhuHF+iksFaHR+VcQt0S5LgAdCgkKbtibOMVmsphZk9lE5kueTDY78+WcIPDx8fn3jDDGBFPM8h0ncxZiaanvYanHNDp7bLHD/ktXHwMM7YxmFJ09DjjipNk5/3WoDEnucU/5f8YFV9w0+rpBPnuEKCvCDyqooibve3IWUERJ7rlOhEaC+q1qYpViLerS4TqRoQ42iN+cLbSdbvDKE/YLEj8=
+   eJzt0csOwUAAheFBi4XLirCxcykWLq+kSx4AOywkWPDCfjFNJtWpKZ1IpCf50jTNnMxJhciSJcu/ZwAPQ4ww/u11Ps5UmqfUd0upJ2lMdqyxwfZNVxc99MXzP6u8r28aH5MdO+xxMOycKL0PM8lm1B3XiO9HnHDGxaCvLV53BFtsxoEb4sQoooSyPN+RzxzyKGjOuZZ3VFFThN/D6lhE8KWK7FAFZ23vSKKFFZaaZwNNzRabuQP5qRWP
   </data>
  </layer>
  <layer name="Platforms 2" width="50" height="13">

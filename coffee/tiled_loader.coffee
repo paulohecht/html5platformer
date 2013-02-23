@@ -7,6 +7,8 @@ class Game.TiledLoader extends Game.Mixable
   
   mixins: [Game.Events]
   
+  mapCols: 0
+  
   render: (@stage, @url) =>
     tokens = @url.split("/")
     tokens.pop()
@@ -20,9 +22,11 @@ class Game.TiledLoader extends Game.Mixable
     @tileset.src = "#{@path}/#{@mapData.tilesets[TILESET_IDX].image}"
   	#callback for loading layers after tileset is loaded
 
+  getMapWidth: =>
+    @mapCols * @mapData.tilewidth
+
   #loading layers
   initLayers: =>
-    #compose EaselJS tileset from image (fixed 64x64 now, but can be parametized)
     imageData =
       images: [@tileset]
       frames:
@@ -34,14 +38,21 @@ class Game.TiledLoader extends Game.Mixable
     
     #loading each layer at a time
     for idx in [0..@mapData.layers.length - 1]
-    	layerData = @mapData.layers[idx]
-    	@initLayer(layerData)
+      layerData = @mapData.layers[idx]
+      @initLayer(layerData)
+    @trigger "loaded"
 
   #layer initialization
   initLayer: (layerData) =>
-  	for row in [0..layerData.height - 1]
-  		for col in [0..layerData.width - 1]
+    
+    for row in [0..layerData.height - 1]
+    	for col in [0..layerData.width - 1]
         idx = layerData.data[(col + row * layerData.width)] - 1
+    	  
+        unless layerData.properties && layerData.properties.parallax
+          if (idx != -1) 
+            @mapCols = col + 1 if (@mapCols < col + 1)
+    	  
         x = col * @mapData.tilewidth
         y = row * @mapData.tileheight
         tileData = @mapData.tilesets[TILESET_IDX].tileproperties[idx]

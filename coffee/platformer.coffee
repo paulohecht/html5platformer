@@ -19,10 +19,11 @@ class Game.Platformer
     
     @fishs = []
     
-    tiledloader = new Game.TiledLoader()
-    tiledloader.render(@gameLayer, "assets/tiled/map.json")
+    @mapLoader = new Game.TiledLoader()
+    @mapLoader.on "instantiaterequest", @onInstantiateRequest
+    @mapLoader.on "loaded", @onMapLoaded
+    @mapLoader.render(@gameLayer, "assets/tiled/map.json")
 
-    tiledloader.on "instantiaterequest", @onInstantiateRequest
 
     #stage updates (not really used here)
     createjs.Ticker.setFPS(30)
@@ -36,6 +37,12 @@ class Game.Platformer
     
     Game.Audio.playBG("bg-music")
     
+    @camera = Game.Instances.createCamera(@stage)
+    
+  onMapLoaded: =>
+    @camera.setTarget(@player)
+    @camera.setBounds(0, @mapLoader.getMapWidth())
+    Game.Physics.createWorldLateralbounds(0, @mapLoader.getMapWidth(), @stage.canvas.height)
     
   onInstantiateRequest: (data, x, y) =>
     switch data.class
@@ -72,5 +79,8 @@ class Game.Platformer
     
     @player.update(elapsed) if @player
     
+    @camera.update()
+    
+    @gameLayer.x = -@camera.x
+    
     @stage.update()
-

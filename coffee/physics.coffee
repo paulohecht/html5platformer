@@ -16,7 +16,10 @@
   
   @createBody: (body) =>
     @instance().createBody(body)
-  
+    
+  @createWorldLateralbounds: (minX, maxX, height) =>
+    @instance().createWorldLateralbounds(minX, maxX, height)
+    
 class Game.PhysicsImpl
   
   fixedTick: 1 / 60
@@ -32,11 +35,10 @@ class Game.PhysicsImpl
     @debugDraw = new Box2D.Dynamics.b2DebugDraw()
     @debugDraw.SetSprite(document.getElementById("debugCanvas").getContext("2d"))
     @debugDraw.SetDrawScale(Game.Physics.SCALE)
-    @debugDraw.SetFillAlpha(0.5)
+    @debugDraw.SetFillAlpha(0.2)
     @debugDraw.SetLineThickness(1.0)
     @debugDraw.SetFlags(Box2D.Dynamics.b2DebugDraw.e_shapeBit)
     @world.SetDebugDraw(@debugDraw)
-    @createBoundingBox()
     
   update: (elapsed) =>
     
@@ -58,19 +60,23 @@ class Game.PhysicsImpl
   createBody: (body) =>
     @world.CreateBody(body)
 
-  createBoundingBox: =>
+  createWorldLateralbounds: (minX, maxX, height) =>
     scale = Game.Physics.SCALE
+    thickness = 32
     fixDef = new Box2D.Dynamics.b2FixtureDef()
     fixDef.shape = new Box2D.Collision.Shapes.b2PolygonShape()
-    fixDef.shape.SetAsBox(32 / scale, 400 / scale)
-    fixDef.density = 0.0
-    fixDef.friction = 0.0
-    fixDef.restitution = 0
-    bodyDef = new Box2D.Dynamics.b2BodyDef()
-    bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody
-    bodyDef.position.Set(-32 / scale, 0 / scale)
-    @body = Game.Physics.createBody(bodyDef)
-    @body.CreateFixture(fixDef)
+    fixDef.shape.SetAsBox(thickness / scale, height / scale)
+    leftBodyDef = new Box2D.Dynamics.b2BodyDef()
+    leftBodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody
+    leftBodyDef.position.Set(-thickness / scale, 0 / scale)
+    leftBody = Game.Physics.createBody(leftBodyDef)
+    leftBody.CreateFixture(fixDef)
+    rightBodyDef = new Box2D.Dynamics.b2BodyDef()
+    rightBodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody
+    rightBodyDef.position.Set((maxX + thickness) / scale, 0 / scale)
+    rightBody = Game.Physics.createBody(rightBodyDef)
+    rightBody.CreateFixture(fixDef)
+    
     
 class CustomContactListener extends Box2D.Dynamics.b2ContactListener
     
