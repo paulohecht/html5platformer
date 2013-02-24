@@ -19,10 +19,12 @@ class Game.Platformer
     
     @fishs = []
     
-    @mapLoader = new Game.TiledLoader()
-    @mapLoader.on "instantiaterequest", @onInstantiateRequest
-    @mapLoader.on "loaded", @onMapLoaded
-    @mapLoader.render(@gameLayer, "assets/tiled/map.json")
+    @camera = Game.Instances.createCamera(@stage)
+
+    @map = new Game.TiledLoader()
+    @map.on "instantiaterequest", @onInstantiateRequest
+    @map.on "loaded", @onMapLoaded
+    @map.render(@gameLayer, "assets/tiled/map.json")
 
 
     #stage updates (not really used here)
@@ -37,12 +39,11 @@ class Game.Platformer
     
     Game.Audio.playBG("bg-music")
     
-    @camera = Game.Instances.createCamera(@stage)
     
   onMapLoaded: =>
     @camera.setTarget(@player)
-    @camera.setBounds(0, @mapLoader.getMapWidth())
-    Game.Physics.createWorldLateralbounds(0, @mapLoader.getMapWidth(), @stage.canvas.height)
+    @camera.setBounds(0, @map.getMapWidth())
+    Game.Physics.createWorldLateralbounds(0, @map.getMapWidth(), @stage.canvas.height)
     
   onInstantiateRequest: (data, x, y) =>
     switch data.class
@@ -82,5 +83,7 @@ class Game.Platformer
     @camera.update()
     
     @gameLayer.x = -@camera.x
+    @map.update()
+    
     
     @stage.update()

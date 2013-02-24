@@ -9,6 +9,8 @@ class Game.TiledLoader extends Game.Mixable
   
   mapCols: 0
   
+  parallaxes: []
+  
   render: (@stage, @url) =>
     tokens = @url.split("/")
     tokens.pop()
@@ -18,9 +20,9 @@ class Game.TiledLoader extends Game.Mixable
     #create EaselJS image for tileset
     #getting imagefile from first tileset
     @tileset = new Image()
+  	#callback for loading layers after tileset is loaded
     @tileset.onload = @initLayers
     @tileset.src = "#{@path}/#{@mapData.tilesets[TILESET_IDX].image}"
-  	#callback for loading layers after tileset is loaded
 
   getMapWidth: =>
     @mapCols * @mapData.tilewidth
@@ -40,19 +42,19 @@ class Game.TiledLoader extends Game.Mixable
     for idx in [0..@mapData.layers.length - 1]
       layerData = @mapData.layers[idx]
       @initLayer(layerData)
+      
+    parallax.setMapWidth(@getMapWidth()) for parallax in @parallaxes
     @trigger "loaded"
 
   #layer initialization
   initLayer: (layerData) =>
-    
+    layerCols = 0
+    layer = new Game.Layer()
+    layer.render(@stage)
     for row in [0..layerData.height - 1]
     	for col in [0..layerData.width - 1]
         idx = layerData.data[(col + row * layerData.width)] - 1
-    	  
-        unless layerData.properties && layerData.properties.parallax
-          if (idx != -1) 
-            @mapCols = col + 1 if (@mapCols < col + 1)
-    	  
+        layerCols = col + 1 if (idx != -1) && (layerCols < col + 1)
         x = col * @mapData.tilewidth
         y = row * @mapData.tileheight
         tileData = @mapData.tilesets[TILESET_IDX].tileproperties[idx]
@@ -60,4 +62,13 @@ class Game.TiledLoader extends Game.Mixable
           @trigger "instantiaterequest", tileData, x, y
         else
           tile = new Game.Tile()
-          tile.render(@stage, @tilesetSheet, idx, x, y, tileData)
+          tile.render(layer, @tilesetSheet, idx, x, y, tileData)
+          
+    unless layerData.properties && layerData.properties.parallax
+      @mapCols = layerCols if (@mapCols < layerCols)
+    else
+      layer.setAsParallax(layerCols * @mapData.tilewidth)
+      @parallaxes.push(layer)
+      
+  update: =>
+    parallax.update() for parallax in @parallaxes

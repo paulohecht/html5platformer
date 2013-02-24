@@ -98,22 +98,22 @@
    </properties>
   </tile>
  </tileset>
- <layer name="Sky" width="50" height="13" visible="0">
+ <layer name="Sky" width="50" height="13">
   <properties>
    <property name="parallax" value="true"/>
   </properties>
   <data encoding="base64" compression="zlib">
-   eJzt0sENwCAMA8DsPwItfErbNTETIFtB4uHH/QIhwS0iWpIHXvjgT7yXUeCCG+pBfdj6uctO7LOI87J92HrlPVn3npoF9oySBWVu5W935mF31szMbG0A9o6SGQ==
+   eJybx8DAMI9KeDEQLwXiZUC8HIs8LQHMjllAPBuI5wDxXCr6jd7+AIXlEgb84YmMQf4m1b/08Ac5aYgY/w4mf5CT5rDpGWh/kJrmcOkZaH8MpXw+6o9Rf4z6Y9Qfg90fAIPk2Rw=
   </data>
  </layer>
  <layer name="Platforms" width="50" height="13">
   <data encoding="base64" compression="zlib">
-   eJzt0csOwUAAheFBi4XLirCxcykWLq+kSx4AOywkWPDCfjFNJtWpKZ1IpCf50jTNnMxJhciSJcu/ZwAPQ4ww/u11Ps5UmqfUd0upJ2lMdqyxwfZNVxc99MXzP6u8r28aH5MdO+xxMOycKL0PM8lm1B3XiO9HnHDGxaCvLV53BFtsxoEb4sQoooSyPN+RzxzyKGjOuZZ3VFFThN/D6lhE8KWK7FAFZ23vSKKFFZaaZwNNzRabuQP5qRWP
+   eJzt0ssOwUAUBuBBXRYuK7eNnUuxcHmlWvIA2GEhwYIX9oszycmYaYeOSGRO8qXpaefvnLZC+PLl699rACEMYQTj327n45qSuaO8m6Ocd8tmjjVsYJuQ1YUe9MXzO3Ohpif7Lv4Hmzl2sIeDZeaE5T7MiK4npf0f+BxXzfUjnOAMF4u8tnidQ+5b7fFraecIIK8IYhSgCCVa36FjBrKQM6yLy016po0KVBn1XFWDSGNBypTB8WxTT3fPtzShBStYGo51aBhmMeXavD8Tue4OKkodEw==
   </data>
  </layer>
  <layer name="Platforms 2" width="50" height="13">
   <data encoding="base64" compression="zlib">
-   eJztzrkNACAQxMBrhp+Ap//ecAuQHMGO5NxmIiIi9wJFSpSpUKVG3fHr1aBJi7bzi8gvDkmpAgs=
+   eJxjYBgFo2AUjIJRMJJAGpXMUQViNSBWB2ININYEYi0g1gZiHSrZgQ9Qyx8wYADEhkBsBMTGVDYbH8ino12jYBSQCgBz1QNG
   </data>
  </layer>
  <layer name="Details" width="50" height="13">
