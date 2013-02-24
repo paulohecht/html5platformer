@@ -74,11 +74,13 @@ class Game.Platformer
     
     Game.Audio.toggleMuteBG() if (Game.Input.isKeyDown("m"))
     
-    Game.Physics.update(elapsed)
     Game.Input.update()
+
+    @player.update(elapsed) if @player
+
+    Game.Physics.update(elapsed)
     Game.Popup.update()
     
-    @player.update(elapsed) if @player
     
     @camera.update()
     

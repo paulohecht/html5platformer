@@ -2,6 +2,7 @@
   
   @SCALE: 20.0
   @GRAVITY: {x: 0, y: 50}
+  @FIXED_TIME_STEP: 1 / 60
   
   _instance = undefined
   
@@ -20,9 +21,12 @@
   @createWorldLateralbounds: (minX, maxX, height) =>
     @instance().createWorldLateralbounds(minX, maxX, height)
     
-class Game.PhysicsImpl
+  @on: (args...) =>
+    @instance().on(args...)  
+    
+class Game.PhysicsImpl extends Game.Mixable
   
-  fixedTick: 1 / 60
+  mixins: [Game.Events]
   
   proccessTime: 0
   
@@ -45,9 +49,10 @@ class Game.PhysicsImpl
     @showDebug = !@showDebug if Game.Input.isKeyDown("d")
     
     @proccessTime += elapsed
-    fixedTickMs = @fixedTick * 1000
+    fixedTickMs = Game.Physics.FIXED_TIME_STEP * 1000
     while(@proccessTime > fixedTickMs)
-      @world.Step(@fixedTick, 10, 10)
+      @trigger "update"
+      @world.Step(Game.Physics.FIXED_TIME_STEP, 10, 10)
       @world.ClearForces()
       @proccessTime -= fixedTickMs
       
@@ -95,7 +100,7 @@ class CustomContactListener extends Box2D.Dynamics.b2ContactListener
           Game.Instances.getPlayer().addBodyContact()
           
         if (userDataA == "player" || userDataB == "player") 
-          Game.Instances.getPlayer().onCollision((if userDataA == "player" then userDataB else userDataA))
+          Game.Instances.getPlayer().onCollisionEnter((if userDataA == "player" then userDataB else userDataA))
         
     EndContact: (contact) =>
         fixtureA = contact.GetFixtureA()
@@ -111,6 +116,8 @@ class CustomContactListener extends Box2D.Dynamics.b2ContactListener
         if ((fixtureA.GetUserData() == sensorName && @isGround(userDataB)) || (fixtureB.GetUserData() == sensorName && @isGround(userDataA)))
           Game.Instances.getPlayer().removeBodyContact()
           
+        if (userDataA == "player" || userDataB == "player") 
+          Game.Instances.getPlayer().onCollisionExit((if userDataA == "player" then userDataB else userDataA))
     
     PreSolve: (contact, oldManifold) =>
         fixtureA = contact.GetFixtureA()

@@ -18,6 +18,9 @@ class Game.Player extends Game.Mixable
   
   footContactCount: 0
   bodyContactCount: 0
+  ladderContactCount: 0
+  
+  onLadder: false
   
   render: (@stage, @x, @y) =>
     
@@ -36,6 +39,7 @@ class Game.Player extends Game.Mixable
           stand_left: 7
           jump_left: 13
           death: 14
+          ladder: [15, 16, "ladder", 4]
     
     @tilesetSheet = new createjs.SpriteSheet(imageData)
     @bitmap = new createjs.BitmapAnimation(@tilesetSheet)
@@ -45,6 +49,8 @@ class Game.Player extends Game.Mixable
     @createPhysicsBody()
     @createBodySensor()
     @createFootSensor()
+    
+    Game.Physics.on "update", @physicsUpdate
     
     @respawn(@x, @y)
     
@@ -90,12 +96,24 @@ class Game.Player extends Game.Mixable
     vel.x = 0
     vel.y = 0
     
+  physicsUpdate: =>
+    if @onLadder
+      vel = @body.GetLinearVelocity()
+      if (Game.Input.isKeyPressed("up"))
+        vel.y = -@velocity
+      else
+        @bitmap.stop()
+        #Compensate 1 physics step gravity velocity...
+        vel.y = -Game.Physics.GRAVITY.y * Game.Physics.FIXED_TIME_STEP
+    
   update: (elapsed) =>
     
     @processInput(elapsed)
     
     @bitmap.x = @x = (@body.GetPosition().x * Game.Physics.SCALE) - @physicsSize
     @bitmap.y = @y = (@body.GetPosition().y * Game.Physics.SCALE) - 22
+    
+    @onLadder = false unless @isTouchingLadder()
     
     @die() if @y > 350
     
@@ -110,17 +128,22 @@ class Game.Player extends Game.Mixable
 
     if (Game.Input.isKeyPressed("up"))
 
-      if (@isTouchingGround() && !@isJumping && !(vel.y < 0)) 
-        Game.Audio.playSFX("jump-sound") 
-        @isJumping = true
-        @jumpImpulseTime = 0
-
-      if (@isJumping)
-        @body.ApplyImpulse({ x: 0, y: -@jump }, @body.GetWorldCenter())
-        @jumpImpulseTime += elapsed
-
-      if (@jumpImpulseTime > @maxJumpImpulseTime)
-        @isJumping = false
+      if (@isTouchingLadder())
+        @onLadder = true
+        vel.y = -10
+      else
+      
+        if (@isTouchingGround() && !@isJumping && !(vel.y < 0)) 
+          Game.Audio.playSFX("jump-sound") 
+          @isJumping = true
+          @jumpImpulseTime = 0
+  
+        if (@isJumping)
+          @body.ApplyImpulse({ x: 0, y: -@jump }, @body.GetWorldCenter())
+          @jumpImpulseTime += elapsed
+  
+        if (@jumpImpulseTime > @maxJumpImpulseTime)
+          @isJumping = false
 
     else
       @isJumping = false
@@ -128,7 +151,9 @@ class Game.Player extends Game.Mixable
     @direction = 'right' if vel.x > 0
     @direction = 'left' if vel.x < 0
     
-    if @isJumping || Math.abs(vel.y) > 0
+    if @onLadder
+      @playAnimation("ladder")
+    else if @isJumping || Math.abs(vel.y) > 0
       @playAnimation("jump_#{@direction}")
     else
       if Math.abs(vel.x) > 0
@@ -172,9 +197,15 @@ class Game.Player extends Game.Mixable
   isTouchingGround: =>
     @footContactCount > 0 && @bodyContactCount == 0
     
-  onCollision: (other) =>
+  onCollisionEnter: (other) =>
     switch(other)
       when "princess" then @touchPrincess()
       when "enemy" then @die()
-    
-    
+      when "ladder" then @ladderContactCount++
+
+  onCollisionExit: (other) =>
+    switch(other)
+      when "ladder" then @ladderContactCount--
+
+  isTouchingLadder: =>
+    @ladderContactCount > 0

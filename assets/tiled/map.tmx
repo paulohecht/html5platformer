@@ -97,6 +97,16 @@
     <property name="collision" value="cloud"/>
    </properties>
   </tile>
+  <tile id="101">
+   <properties>
+    <property name="collision" value="ladder"/>
+   </properties>
+  </tile>
+  <tile id="110">
+   <properties>
+    <property name="collision" value="ladder"/>
+   </properties>
+  </tile>
  </tileset>
  <layer name="Sky" width="50" height="13">
   <properties>
@@ -113,7 +123,7 @@
  </layer>
  <layer name="Platforms 2" width="50" height="13">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUjIJRMJJAGpXMUQViNSBWB2ININYEYi0g1gZiHSrZgQ9Qyx8wYADEhkBsBMTGVDYbH8ino12jYBSQCgBz1QNG
+   eJxjYBgFo2AUjASQNtAOoBLIH2gHUAkMpD+olRZUgVgNiNWBWAOINYFYC4i1gViHSnbgA9RO0wZAbAjERkBsTGWz8YHhkqZHwfAEAFQGBIo=
   </data>
  </layer>
  <layer name="Details" width="50" height="13">
