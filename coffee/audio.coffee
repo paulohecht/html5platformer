@@ -42,7 +42,7 @@ class Game.AudioImpl
   
   bgInstance: null
   
-  bgVolume: 0.4
+  bgVolume: 0.0
   
   playSFX: (id) =>
       return if @isMuteSFX

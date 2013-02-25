@@ -1,18 +1,14 @@
-class Game.Fish
+class Game.Fish extends Game.Object
 
-  velocity: 10
-  
   width: 32
   height: 32
-  
-  direction: 'right'
   
   render: (@stage, @x, @y) =>
     imageData =
       images: [Game.Preloader.get("fish-sprite")]
       frames:
-        width: 32
-        height: 32
+        width: @width
+        height: @height
       animations:
         default: [0, 1, "default", 4]
 
@@ -22,27 +18,21 @@ class Game.Fish
     @bitmap.x = @x
     @bitmap.y = @y
     @stage.addChild(@bitmap)
-    @offset = (384 - @y)/ @height #Magick number alert... its the bottom most tile height
     @createPhysicsBody()
-    createjs.Ticker.addListener(@)
+    @setTween()
     
   createPhysicsBody: =>
-    size = 10
-    fixDef = new Box2D.Dynamics.b2FixtureDef()
-    fixDef.shape = new Box2D.Collision.Shapes.b2CircleShape(size / Game.Physics.SCALE)
-    fixDef.density = 1.0
-    fixDef.friction = 0.0
-    fixDef.restitution = 0
-    bodyDef = new Box2D.Dynamics.b2BodyDef()
-    bodyDef.fixedRotation = true
-    bodyDef.gravityScale = 10.0
-    bodyDef.allowSleep = false
-    bodyDef.type = Box2D.Dynamics.b2Body.b2_kinematicBody
-    bodyDef.position.Set((@x + size * 1.5) / Game.Physics.SCALE, (@y + size * 1.5) / Game.Physics.SCALE)
-    bodyDef.userData = "enemy"
-    @body = Game.Physics.createBody(bodyDef)
-    @body.CreateFixture(fixDef)
-    
+    physicsSize = 10
+    @body = new Game.Collider
+      shape: "circle"
+      x: @x + physicsSize * 1.5
+      y: @y + physicsSize * 1.5
+      radius: physicsSize
+      type: Game.Collider.Type.kinematic
+      userData: @
+
+  setTween: =>
+    offset = (400 - @y)/ @height #Magick number alert... its the bottom most tile height
     initialY = (400 + @height / 2)
     @y = initialY
     setTimeout( =>
@@ -50,9 +40,9 @@ class Game.Fish
         .wait(1000)
         .to({y: 220}, 1000, createjs.Ease.sineOut)
         .to({y: initialY}, 1000, createjs.Ease.sineIn)
-    , 1000 * @offset)
-    
-  tick: (elapsed) =>
-    bodyPosition = @body.GetPosition()
-    @body.SetPosition({x: bodyPosition.x, y: (@y + @height / 2) / Game.Physics.SCALE})    
+    , 1000 * offset)
+
+  update: =>
+    physicsSize = 10
+    @body.setPosition((@x + physicsSize * 1.5), (@y + physicsSize * 1.5))
     @bitmap.y = @y

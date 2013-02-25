@@ -1,6 +1,4 @@
-class Game.Player extends Game.Mixable
-  
-  mixins: [Game.Events]
+class Game.Player extends Game.Object
 
   velocity: 10
   
@@ -14,13 +12,13 @@ class Game.Player extends Game.Mixable
   
   direction: 'right'
   
-  physicsSize: 10
-  
   footContactCount: 0
   bodyContactCount: 0
   ladderContactCount: 0
   
   onLadder: false
+  
+  colliderRadius: 10
   
   render: (@stage, @x, @y) =>
     
@@ -50,55 +48,80 @@ class Game.Player extends Game.Mixable
     @createBodySensor()
     @createFootSensor()
     
-    Game.Physics.on "update", @physicsUpdate
-    
     @respawn(@x, @y)
     
   createPhysicsBody: =>
-    fixDef = new Box2D.Dynamics.b2FixtureDef()
-    fixDef.shape = new Box2D.Collision.Shapes.b2CircleShape(@physicsSize / Game.Physics.SCALE)
-    fixDef.density = 1.0
-    fixDef.friction = 0.0
-    fixDef.restitution = 0
-    bodyDef = new Box2D.Dynamics.b2BodyDef()
-    bodyDef.fixedRotation = true
-    bodyDef.gravityScale = 10.0
-    bodyDef.allowSleep = false
-    bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody
-    bodyDef.position.Set((@x + @physicsSize) / Game.Physics.SCALE, (@y + @physicsSize) / Game.Physics.SCALE)
-    bodyDef.userData = "player"
-    @body = Game.Physics.createBody(bodyDef)
-    @body.CreateFixture(fixDef)
+    @body = new Game.Collider
+      shape: 'circle'
+      x: @x + @colliderRadius
+      y: @y + @colliderRadius
+      radius: @colliderRadius
+      type: Game.Collider.Type.dynamic
+      density: 1.0
+      userData: @
     
   createBodySensor: =>
-    fixDef = new Box2D.Dynamics.b2FixtureDef()
-    fixDef.shape = new Box2D.Collision.Shapes.b2CircleShape(@physicsSize / (Game.Physics.SCALE * 1.5))
-    fixDef.isSensor = true
-    fixDef.userData = "body"
-    @bodySensor = @body.CreateFixture(fixDef)
+    @body.addCircleFixture
+      radius: @colliderRadius / 1.5
+      isSensor: true
+      userData: "body"
     
   createFootSensor: =>
-    fixDef = new Box2D.Dynamics.b2FixtureDef()
-    fixDef.shape = new Box2D.Collision.Shapes.b2CircleShape(@physicsSize / (Game.Physics.SCALE * 4) )
-    fixDef.isSensor = true
-    fixDef.userData = "foot"
-    fixDef.shape.m_p.y = @physicsSize / Game.Physics.SCALE
-    @footSensor = @body.CreateFixture(fixDef)
-    
-    
+    @body.addCircleFixture
+      radius: @colliderRadius / 4
+      offsetY: @colliderRadius
+      isSensor: true
+      userData: "foot"
+
+  beginContact: (other, fixtureUserData, otherFixtureUserData) =>
+    if other instanceof Game.Tile
+      if other.isGround()
+        if fixtureUserData == "foot" 
+          @footContactCount++
+        if fixtureUserData == "body"
+          @bodyContactCount++
+      if other.isLadder()
+        if fixtureUserData == "body"
+          @ladderContactCount++
+    if other instanceof Game.Princess
+      @touchPrincess()
+    if other instanceof Game.Fish
+      @die()
+        
+  endContact: (other, fixtureUserData, otherFixtureUserData) =>
+    if other instanceof Game.Tile
+      if other.isGround()
+        if fixtureUserData == "foot" 
+          @footContactCount--
+        if fixtureUserData == "body"
+          @bodyContactCount--
+      if other.isLadder()
+        if fixtureUserData == "body"
+          @ladderContactCount--
+          
+  beforeContact: (other, fixtureUserData, otherFixtureUserData) =>
+    #if dead, just let it fall...
+    return false if @dead
+    #no collision with cloud platforms unless on top of it...
+    if other instanceof Game.Tile
+      if other.isCloud()
+        if @y - other.y > -(@colliderRadius + (other.height / 2) - 0.0)
+          return false
+    true
+
   respawn: (@x, @y) =>
     @bitmap.gotoAndPlay("stand_#{@direction}")
     @bitmap.x = @x
     @bitmap.y = @y
-    @body.SetPosition({x: (@x + @physicsSize) / Game.Physics.SCALE, y: (@y + @height) / Game.Physics.SCALE})
+    @body.setPosition((@x + @colliderRadius), (@y + @colliderRadius))
     @dead = false
-    vel = @body.GetLinearVelocity()
+    vel = @body.getVelocity()
     vel.x = 0
     vel.y = 0
     
-  physicsUpdate: =>
+  fixedUpdate: =>
     if @onLadder
-      vel = @body.GetLinearVelocity()
+      vel = @body.getVelocity()
       if (Game.Input.isKeyPressed("up"))
         vel.y = -@velocity
       else
@@ -106,28 +129,26 @@ class Game.Player extends Game.Mixable
         #Compensate 1 physics step gravity velocity...
         vel.y = -Game.Physics.GRAVITY.y * Game.Physics.FIXED_TIME_STEP
     
-  update: (elapsed) =>
+  update: =>
+    
+    elapsed = Game.Time.deltaTime()
     
     @processInput(elapsed)
     
-    @bitmap.x = @x = (@body.GetPosition().x * Game.Physics.SCALE) - @physicsSize
-    @bitmap.y = @y = (@body.GetPosition().y * Game.Physics.SCALE) - 22
+    @bitmap.x = @x = @body.x - @colliderRadius
+    @bitmap.y = @y = @body.y - @colliderRadius * 2
     
     @onLadder = false unless @isTouchingLadder()
     
     @die() if @y > 350
     
   processInput: (elapsed) =>
-
     return if @dead
-    
-    vel = @body.GetLinearVelocity()
+    vel = @body.getVelocity()
     vel.x = 0
     vel.x += @velocity if Game.Input.isKeyPressed("right")
     vel.x -= @velocity if Game.Input.isKeyPressed("left")
-
     if (Game.Input.isKeyPressed("up"))
-
       if (@isTouchingLadder())
         @onLadder = true
         vel.y = -10
@@ -139,7 +160,7 @@ class Game.Player extends Game.Mixable
           @jumpImpulseTime = 0
   
         if (@isJumping)
-          @body.ApplyImpulse({ x: 0, y: -@jump }, @body.GetWorldCenter())
+          @body.applyImpulse(0, -@jump)
           @jumpImpulseTime += elapsed
   
         if (@jumpImpulseTime > @maxJumpImpulseTime)
@@ -150,7 +171,6 @@ class Game.Player extends Game.Mixable
 
     @direction = 'right' if vel.x > 0
     @direction = 'left' if vel.x < 0
-    
     if @onLadder
       @playAnimation("ladder")
     else if @isJumping || Math.abs(vel.y) > 0
@@ -166,46 +186,20 @@ class Game.Player extends Game.Mixable
     @dead = true
     @playAnimation("death")
     Game.Audio.playSFX("dead-sound")
-    vel = @body.GetLinearVelocity()
+    vel = @body.getVelocity()
     vel.x = 0
     vel.y = 0
-    @body.ApplyImpulse({ x: 0, y: -20 }, @body.GetWorldCenter())
+    @body.applyImpulse(0, -(4 * @jump))
     setTimeout((=> @trigger("die")), 1000)
     
-  isDead: =>
-    @dead
-    
   touchPrincess: =>
-    Game.Audio.playSFX("princess-sound") 
-    Game.Popup.show("saved")
+    @trigger "findprincess"
       
   playAnimation: (animation) =>
     @bitmap.gotoAndPlay(animation) unless animation == @bitmap.currentAnimation
-    
-  addBodyContact: =>
-    @bodyContactCount++    
 
-  removeBodyContact: =>
-    @bodyContactCount--
-    
-  addFootContact: =>
-    @footContactCount++    
-
-  removeFootContact: =>
-    @footContactCount--
-    
   isTouchingGround: =>
     @footContactCount > 0 && @bodyContactCount == 0
-    
-  onCollisionEnter: (other) =>
-    switch(other)
-      when "princess" then @touchPrincess()
-      when "enemy" then @die()
-      when "ladder" then @ladderContactCount++
-
-  onCollisionExit: (other) =>
-    switch(other)
-      when "ladder" then @ladderContactCount--
 
   isTouchingLadder: =>
     @ladderContactCount > 0

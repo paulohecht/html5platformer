@@ -51,18 +51,20 @@ class Game.TiledLoader extends Game.Mixable
     layerCols = 0
     layer = new Game.Layer()
     layer.render(@stage)
+    tileWidth = @mapData.tilewidth
+    tileHeight = @mapData.tileheight
     for row in [0..layerData.height - 1]
     	for col in [0..layerData.width - 1]
         idx = layerData.data[(col + row * layerData.width)] - 1
         layerCols = col + 1 if (idx != -1) && (layerCols < col + 1)
-        x = col * @mapData.tilewidth
-        y = row * @mapData.tileheight
+        x = col * tileWidth
+        y = row * tileHeight
         tileData = @mapData.tilesets[TILESET_IDX].tileproperties[idx]
         if tileData && "class" of tileData
           @trigger "instantiaterequest", tileData, x, y
         else
           tile = new Game.Tile()
-          tile.render(layer, @tilesetSheet, idx, x, y, tileData)
+          tile.render(layer, @tilesetSheet, idx, x, y, tileWidth, tileHeight, tileData)
           
     unless layerData.properties && layerData.properties.parallax
       @mapCols = layerCols if (@mapCols < layerCols)

@@ -17,15 +17,12 @@ class Game.Platformer
     @popupLayer = new createjs.Container()
     @stage.addChild(@gameLayer, @hudLayer, @popupLayer)
     
-    @fishs = []
-    
     @camera = Game.Instances.createCamera(@stage)
 
     @map = new Game.TiledLoader()
     @map.on "instantiaterequest", @onInstantiateRequest
     @map.on "loaded", @onMapLoaded
     @map.render(@gameLayer, "assets/tiled/map.json")
-
 
     #stage updates (not really used here)
     createjs.Ticker.setFPS(30)
@@ -38,7 +35,6 @@ class Game.Platformer
     Game.Popup.show("intro")
     
     Game.Audio.playBG("bg-music")
-    
     
   onMapLoaded: =>
     @camera.setTarget(@player)
@@ -58,9 +54,14 @@ class Game.Platformer
     @player = Game.Instances.createPlayer()
     @player.render(@gameLayer, x, y)
     @player.on "die", @respawnPlayer
+    @player.on "findprincess", @findPrincess
     
   respawnPlayer: =>
     @player.respawn(@playerSpawnX, @playerSpawnY)
+    
+  findPrincess: =>
+    Game.Audio.playSFX("princess-sound") 
+    Game.Popup.show("saved")
     
   instantiatePrincess: (x, y) =>
     princess = new Game.Princess()
@@ -76,16 +77,14 @@ class Game.Platformer
     
     Game.Input.update()
 
-    @player.update(elapsed) if @player
-
     Game.Physics.update(elapsed)
+    Game.Time.update(elapsed)
+
     Game.Popup.update()
-    
     
     @camera.update()
     
     @gameLayer.x = -@camera.x
     @map.update()
-    
     
     @stage.update()

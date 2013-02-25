@@ -108,7 +108,7 @@
    </properties>
   </tile>
  </tileset>
- <layer name="Sky" width="50" height="13">
+ <layer name="Sky" width="50" height="13" visible="0">
   <properties>
    <property name="parallax" value="true"/>
   </properties>
@@ -118,30 +118,30 @@
  </layer>
  <layer name="Platforms" width="50" height="13">
   <data encoding="base64" compression="zlib">
-   eJzt0ssOwUAUBuBBXRYuK7eNnUuxcHmlWvIA2GEhwYIX9oszycmYaYeOSGRO8qXpaefvnLZC+PLl699rACEMYQTj327n45qSuaO8m6Ocd8tmjjVsYJuQ1YUe9MXzO3Ohpif7Lv4Hmzl2sIeDZeaE5T7MiK4npf0f+BxXzfUjnOAMF4u8tnidQ+5b7fFraecIIK8IYhSgCCVa36FjBrKQM6yLy016po0KVBn1XFWDSGNBypTB8WxTT3fPtzShBStYGo51aBhmMeXavD8Tue4OKkodEw==
+   eJzt0ssOwUAUBuBBXRbF2sZOKRYur8SSB8CuLCRY8MJ+MZOcjJnpoSMSmZN8aXva/p3TVohQoUL9ew0ghSGMYPzb5XxcU2nuKe/mKefd4syxgS3scrJ6kEBfPL8zlRp6qu/jf+DMkcEeDszMCcl9mEmmnlL0f6BzXA3nj3CCM1wYeR3xOodat96j54rOEUFVEznUoA4NKEGX7JehYrnPlZv3TI4mtAj9WNeGhcFSimUGRbNtPdM136LmWMPKso0t63GtkfP+bNR9dypaHPk=
   </data>
  </layer>
- <layer name="Platforms 2" width="50" height="13">
+ <layer name="Platforms 2" width="50" height="13" visible="0">
   <data encoding="base64" compression="zlib">
    eJxjYBgFo2AUjASQNtAOoBLIH2gHUAkMpD+olRZUgVgNiNWBWAOINYFYC4i1gViHSnbgA9RO0wZAbAjERkBsTGWz8YHhkqZHwfAEAFQGBIo=
   </data>
  </layer>
- <layer name="Details" width="50" height="13">
+ <layer name="Details" width="50" height="13" visible="0">
   <data encoding="base64" compression="zlib">
    eJxjYBgFo2AUEAIdA+2AUTAKRgHNAK78PZGurhgFo2BwAgAjGQGi
   </data>
  </layer>
- <layer name="Enemies" width="50" height="13">
+ <layer name="Enemies" width="50" height="13" visible="0">
   <data encoding="base64" compression="zlib">
    eJxjYBgFo4D6oBGImwbaEVQAXUDcPdCOGAWjYBSMglFAFOBEo4ciQHf7QPsFAKsdAj0=
   </data>
  </layer>
- <layer name="Player" width="50" height="13">
+ <layer name="Player" width="50" height="13" visible="0">
   <data encoding="base64" compression="zlib">
    eJxjYBgFo2AUjIJRMApGNlAaaAeMglEwSAEAc+AAIw==
   </data>
  </layer>
- <layer name="Foreground" width="50" height="13">
+ <layer name="Foreground" width="50" height="13" visible="0">
   <data encoding="base64" compression="zlib">
    eJxjYBgFo2AUjIJRMBBg0kA7YBRgBaPxMgpGAQIAAHFUASU=
   </data>
